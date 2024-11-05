@@ -167,8 +167,9 @@ jobs:
           BUILD_ARGS=()
           BUILD_ARGS+=("--build-arg" "BASE_IMAGE_NAME=${{ env.BASE_IMAGE_NAME }}")
           BUILD_ARGS+=("--build-arg" "IMAGE_NAME=${{ env.IMAGE_NAME }}")
-          BUILD_ARGS+=("--build-arg" "FEDORA_MAJOR_VERSION=${{ matrix.fedora_image_version }}")
+          BUILD_ARGS+=("--build-arg" "FEDORA_IMAGE_VERSION=${{ matrix.fedora_image_version }}")
           BUILD_ARGS+=("--build-arg" "SHA_HEAD_SHORT=${{ env.SHA_HEAD_SHORT }}")
+          BUILD_ARGS+=("--build-arg" "FEDORA_MAJOR_VERSION=${{ env.fedora_major_version }}")
 
           TAG_ARGS=()
           IFS=' ' read -r -a tags_array <<< "${{ steps.generate-tags.outputs.alias_tags }}"
