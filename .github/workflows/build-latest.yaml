@@ -1,0 +1,33 @@
+name: Build Latest Images
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+  schedule:
+    - cron: "40 4 * * 1,2,3,4,5,6" # 4:40 UTC All But Sunday
+    - cron: "40 4 * * 0" # 4:40 UTC Sunday
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  build-image:
+    name: Build Latest Images
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/reusable-build.yaml
+    secrets: inherit
+    strategy:
+      fail-fast: false
+    with:
+      fedora_image_version: "latest"
+      brand_name: "silverblue-dx"
+      rechunk: false
+
