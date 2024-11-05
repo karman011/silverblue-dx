@@ -2,6 +2,8 @@
 
 set -ouex pipefail
 
+curl -Lo /etc/yum.repos.d/_copr_che-nerd-fonts-"$(rpm -E %fedora)".repo https://copr.fedorainfracloud.org/coprs/che/nerd-fonts/repo/fedora-"$(rpm -E %fedora)"/che-nerd-fonts-fedora-"$(rpm -E %fedora)".repo
+
 INCLUDED_PACKAGES=($(jq -r '.include[]' /tmp/packages.json | paste -d" " -))
 
 EXCLUDED_PACKAGES=($(jq -r '.exclude[]' /tmp/packages.json | paste -d" " -))

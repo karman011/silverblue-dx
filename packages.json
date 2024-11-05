@@ -3,6 +3,7 @@
         "ibus",
         "ibus-rime",
         "librime-lua",
+        "nerd-fonts",
         "alsa-firmware",
         "apr",
         "apr-util",
