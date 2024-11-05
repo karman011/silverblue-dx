@@ -132,7 +132,7 @@ jobs:
 
           BUILD_TAGS=("${{ matrix.fedora_image_version }}" "${{ matrix.fedora_image_version }}-${TIMESTAMP}")
           
-          echo "DEFAULT_TAG=${BUILD_TAGS[0]}" >> $GITHUB_ENV
+          echo "DEFAULT_TAG=${{ matrix.fedora_image_version }}" >> $GITHUB_ENV
           
           alias_tags=("${BUILD_TAGS[@]}")
 
