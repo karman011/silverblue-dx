@@ -29,10 +29,9 @@ jobs:
       matrix:
         fedora_image_version:
           - "latest"
-          - "38"
-          - "37"
+          - "41"
 
     with:
       fedora_image_version: ${{ matrix.fedora_image_version }}
       brand_name: "silverblue-dx"
-      rechunk: false
+      rechunk: true
