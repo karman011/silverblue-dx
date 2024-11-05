@@ -286,9 +286,8 @@ jobs:
           DIGEST: ${{ steps.push.outputs.outputs && fromJSON(steps.push.outputs.outputs).digest }}
           IMAGE_REGISTRY: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
-          IMAGE_FLAVOR: ${{ env.image_flavor }}
           FEDORA_VERSION: ${{ matrix.fedora_image_version }}
-        run: echo "${IMAGE_REGISTRY}@${DIGEST}" > "${IMAGE_NAME}-${IMAGE_FLAVOR}-${FEDORA_VERSION}.txt"
+        run: echo "${IMAGE_REGISTRY}@${DIGEST}" > "${IMAGE_NAME}-${FEDORA_VERSION}.txt"
 
       - name: Upload artifact
         if: github.event_name != 'pull_request'
