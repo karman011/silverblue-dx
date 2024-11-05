@@ -1,4 +1,4 @@
-name: Build Latest Images
+name: Build Images
 on:
   pull_request:
     branches:
@@ -18,7 +18,7 @@ on:
 
 jobs:
   build-image:
-    name: Build Latest Images
+    name: Build Images
     permissions:
       contents: read
       packages: write
