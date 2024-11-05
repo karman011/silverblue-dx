@@ -21,7 +21,7 @@ RUN --mount=type=cache,dst=/var/cache/rpm-ostree \
     mkdir -p /var/lib/alternatives && \
     /ctx/build.sh && \
     mv /var/lib/alternatives /staged-alternatives && \
-    /ctx/build_files/clean-stage.sh \
+    /ctx/clean-stage.sh \
     ostree container commit && \
     mkdir -p /var/lib && mv /staged-alternatives /var/lib/alternatives && \
     mkdir -p /var/tmp && \
