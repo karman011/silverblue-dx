@@ -3,7 +3,7 @@ ARG SOURCE_IMAGE="${SOURCE_IMAGE:-silverblue}"
 ARG SOURCE_ORG="${SOURCE_ORG:-fedora}"
 ARG BASE_IMAGE="quay.io/${SOURCE_ORG}/fedora-${SOURCE_IMAGE}"
 ARG FEDORA_MAJOR_VERSION="${FEDORA_MAJOR_VERSION:-41}"
-ARG FEDORA_IMAGE_VERSION="${FEDORA_IMAGE_VERSION}:-latest"
+ARG FEDORA_IMAGE_VERSION="${FEDORA_IMAGE_VERSION:-latest}"
 
 FROM scratch AS ctx
 COPY / /
@@ -21,6 +21,7 @@ RUN --mount=type=cache,dst=/var/cache/rpm-ostree \
     mkdir -p /var/lib/alternatives && \
     /ctx/build.sh && \
     mv /var/lib/alternatives /staged-alternatives && \
+    /ctx/build_files/clean-stage.sh \
     ostree container commit && \
     mkdir -p /var/lib && mv /staged-alternatives /var/lib/alternatives && \
     mkdir -p /var/tmp && \
