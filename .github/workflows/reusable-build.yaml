@@ -160,41 +160,28 @@ jobs:
       - name: Define env.SHA_HEAD_SHORT
         run: |
             echo "SHA_HEAD_SHORT=${GITHUB_SHA::7}" >> $GITHUB_ENV
-
+      
       - name: Build Image
         id: build_image
-        run: |
-          set -euox pipefail
+        uses: redhat-actions/buildah-build@v2
+        with:
+          containerfiles: |
+            ./Containerfile
+          image: ${{ env.IMAGE_NAME }}
+          tags: |
+            ${{ steps.generate-tags.outputs.alias_tags }}
+          arch: ${{ matrix.arch }}
+          build-arges: |
+            BASE_IMAGE_NAME=${{ env.BASE_IMAGE_NAME }}
+            IMAGE_NAME=${{ env.IMAGE_NAME }}
+            FEDORA_IMAGE_VERSION=${{ matrix.fedora_image_version }}
+            SHA_HEAD_SHORT=${{ env.SHA_HEAD_SHORT }}
+            FEDORA_MAJOR_VERSION=${{ env.fedora_major_version }}
+          labels: ${{ steps.meta.outputs.labels }}
+          oci: false
 
-          BUILD_ARGS=()
-          BUILD_ARGS+=("--build-arg" "BASE_IMAGE_NAME=${{ env.BASE_IMAGE_NAME }}")
-          BUILD_ARGS+=("--build-arg" "IMAGE_NAME=${{ env.IMAGE_NAME }}")
-          BUILD_ARGS+=("--build-arg" "FEDORA_IMAGE_VERSION=${{ matrix.fedora_image_version }}")
-          BUILD_ARGS+=("--build-arg" "SHA_HEAD_SHORT=${{ env.SHA_HEAD_SHORT }}")
-          BUILD_ARGS+=("--build-arg" "FEDORA_MAJOR_VERSION=${{ env.fedora_major_version }}")
 
-          TAG_ARGS=()
-          IFS=' ' read -r -a tags_array <<< "${{ steps.generate-tags.outputs.alias_tags }}"
-          for tag in "${tags_array[@]}"; do
-            TAG_ARGS+=("--tag" "${{ env.IMAGE_NAME }}:${tag}")
-          done
 
-          LABEL_ARGS=()
-          IFS=' ' read -r -a labels_array <<< "${{ steps.meta.outputs.labels }}"
-          for label in "${labels_array[@]}"; do
-            LABEL_ARGS+=("--label" "${label}")
-          done
-
-          sudo podman build --format docker \
-            "${BUILD_ARGS[@]}" \
-            "${TAG_ARGS[@]}" \
-            "${LABEL_ARGS[@]}" \
-            .
-
-          sudo podman image ls
-
-          echo "image=${{ env.IMAGE_NAME }}" >> $GITHUB_OUTPUT
-          echo "tags=${{ steps.generate-tags.outputs.alias_tags }}" >> $GITHUB_OUTPUT
 
 
       # - name: Check Secureboot
