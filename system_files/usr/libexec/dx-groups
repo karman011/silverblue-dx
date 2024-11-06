@@ -2,7 +2,7 @@
 
 # SCRIPT VERSION
 GROUP_SETUP_VER=1
-GROUP_SETUP_VER_FILE="/etc/ublue/dx-groups"
+GROUP_SETUP_VER_FILE="/etc/dx-groups"
 GROUP_SETUP_VER_RAN=$(cat "$GROUP_SETUP_VER_FILE")
 
 # Run script if updated
@@ -21,18 +21,19 @@ append_group() {
 }
 
 # Setup Groups
-append_group docker
-append_group incus-admin
-append_group lxd
-append_group libvirt
+groups=("docker" "incus-admin" "lxd" "libvirt")
 
+# Loop through each group and append it
+for group in "${groups[@]}"; do
+  append_group "$group"
+done
+
+# Add all users in the 'wheel' group to each of the defined groups
 wheelarray=($(getent group wheel | cut -d ":" -f 4 | tr  ',' '\n'))
-for user in $wheelarray
-do
-  usermod -aG docker $user
-  usermod -aG incus-admin $user
-  usermod -aG lxd $user
-  usermod -aG libvirt $user
+for user in "${wheelarray[@]}"; do
+  for group in "${groups[@]}"; do
+    usermod -aG "$group" "$user"
+  done
 done
 
 # Prevent future executions

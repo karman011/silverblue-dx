@@ -55,9 +55,11 @@ jobs:
       - name: Matrix Variables
         run: |
           echo "IMAGE_NAME=${{ matrix.brand_name }}" >> $GITHUB_ENV
-          # BASE_IMAGE_NAME
+          # Set BASE_IMAGE_NAME
           if [[ "${{ matrix.brand_name }}" =~ "silverblue-dx" ]]; then
-              echo "BASE_IMAGE_NAME"="silverblue" >> $GITHUB_ENV
+              echo "BASE_IMAGE_NAME=silverblue" >> $GITHUB_ENV
+          else
+              echo "BASE_IMAGE_NAME=silverblue" >> $GITHUB_ENV
           fi
 
 
