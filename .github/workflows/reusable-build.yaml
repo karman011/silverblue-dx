@@ -148,7 +148,7 @@ jobs:
           fi
           
           # Set default tag for rechunk use
-          echo "DEFAULT_TAG=raw" >> $GITHUB_ENV
+          echo "DEFAULT_TAG=${BUILD_TAGS[0]}" >> $GITHUB_ENV
           
           # Log generated tags
           echo "Generated tags:"
@@ -192,7 +192,8 @@ jobs:
             LABEL_ARGS+=("--label" "${label}")
           done
           
-          BUILD_TAG=( "--tag" "${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}" )
+          RAW_TAG="raw"
+          BUILD_TAG=("--tag" "${RAW_TAG}")
           sudo podman build --format docker \
             "${BUILD_ARGS[@]}" \
             "${BUILD_TAG[@]}" \
@@ -203,6 +204,7 @@ jobs:
 
           echo "image=${{ env.IMAGE_NAME }}" >> $GITHUB_OUTPUT
           echo "tags=${{ steps.generate-tags.outputs.alias_tags }}" >> $GITHUB_OUTPUT
+          echo "raw_tag=${RAW_TAG}" >> $GITHUB_OUTPUT
 
 
       # - name: Check Secureboot
@@ -240,7 +242,7 @@ jobs:
         uses: hhd-dev/rechunk@602e6d62558ab23e15e8764ce06e26c0f328da71 # v1.0.1
         with:
           rechunk: ghcr.io/hhd-dev/rechunk:v1.0.1
-          ref: ${{ steps.build_image.outputs.image }}:${{ env.DEFAULT_TAG }}
+          ref: ${{ steps.build_image.outputs.image }}:${{ steps.build_image.outputs.raw_tag }}
           skip_compression: 'true'
           labels: ${{ steps.meta.outputs.labels }}
           prev-ref: ${{ steps.registry_case.outputs.lowercase }}/${{ steps.build_image.outputs.image }}:${{ env.DEFAULT_TAG }}
