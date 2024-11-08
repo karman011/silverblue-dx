@@ -193,7 +193,7 @@ jobs:
           done
           
           RAW_TAG="raw"
-          BUILD_TAG=("--tag" "${RAW_TAG}")
+          BUILD_TAG=("--tag" "${{ env.IMAGE_NAME }}:${RAW_TAG}")
           sudo podman build --format docker \
             "${BUILD_ARGS[@]}" \
             "${BUILD_TAG[@]}" \
