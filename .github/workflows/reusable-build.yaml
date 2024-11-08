@@ -47,7 +47,6 @@ jobs:
           - ${{ inputs.brand_name }}
         fedora_image_version:
           - ${{ inputs.fedora_image_version }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
@@ -61,7 +60,6 @@ jobs:
           else
               echo "BASE_IMAGE_NAME=silverblue" >> $GITHUB_ENV
           fi
-
 
       - name: Get Current Fedora Version
         id: labels
@@ -123,26 +121,41 @@ jobs:
         id: generate-tags
         shell: bash
         run: |
-          # Generate a timestamp for creating an image version history
+          # Generate timestamp and short SHA
           TIMESTAMP="$(date +%Y%m%d)"
-
-          COMMIT_TAGS=()
-          BUILD_TAGS=()
-
-          # Have tags for tracking builds during pull request
           SHA_SHORT="${GITHUB_SHA::7}"
-
-          BUILD_TAGS=("${{ matrix.fedora_image_version }}" "${{ matrix.fedora_image_version }}-${TIMESTAMP}")
           
-          echo "DEFAULT_TAG=${{ matrix.fedora_image_version }}" >> $GITHUB_ENV
+          # Initialize tags array
+          BUILD_TAGS=()
           
-          alias_tags=("${BUILD_TAGS[@]}")
-
-          echo "Generated the following build tags: "
-          for TAG in "${BUILD_TAGS[@]}"; do
-              echo "${TAG}"
-          done
-          echo "alias_tags=${alias_tags[*]}" >> $GITHUB_OUTPUT
+          # Base version tag
+          BASE_TAG="${{ matrix.fedora_image_version }}"
+          
+          # Generate tags based on event type
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # For PRs: add PR number and commit hash
+            PR_NUMBER="${{ github.event.pull_request.number }}"
+            BUILD_TAGS=(
+              "${BASE_TAG}-pr${PR_NUMBER}"
+              "${BASE_TAG}-${SHA_SHORT}"
+            )
+          else
+            # For other events: use version and timestamp
+            BUILD_TAGS=(
+              "${BASE_TAG}"
+              "${BASE_TAG}-${TIMESTAMP}"
+            )
+          fi
+          
+          # Set default tag for rechunk use
+          echo "DEFAULT_TAG=raw" >> $GITHUB_ENV
+          
+          # Log generated tags
+          echo "Generated tags:"
+          printf '%s\n' "${BUILD_TAGS[@]}"
+          
+          # Set output for use in later steps
+          echo "alias_tags=${BUILD_TAGS[*]}" >> $GITHUB_OUTPUT
 
       # Build metadata
       - name: Image Metadata
@@ -172,22 +185,17 @@ jobs:
           BUILD_ARGS+=("--build-arg" "FEDORA_IMAGE_VERSION=${{ matrix.fedora_image_version }}")
           BUILD_ARGS+=("--build-arg" "SHA_HEAD_SHORT=${{ env.SHA_HEAD_SHORT }}")
           BUILD_ARGS+=("--build-arg" "FEDORA_MAJOR_VERSION=${{ env.fedora_major_version }}")
-
-          TAG_ARGS=()
-          IFS=' ' read -r -a tags_array <<< "${{ steps.generate-tags.outputs.alias_tags }}"
-          for tag in "${tags_array[@]}"; do
-            TAG_ARGS+=("--tag" "${{ env.IMAGE_NAME }}:${tag}")
-          done
-
+          
           LABEL_ARGS=()
           IFS=' ' read -r -a labels_array <<< "${{ steps.meta.outputs.labels }}"
           for label in "${labels_array[@]}"; do
             LABEL_ARGS+=("--label" "${label}")
           done
-
+          
+          BUILD_TAG=( "--tag" "${{ env.IMAGE_NAME }}:${{ env.DEFAULT_TAG }}" )
           sudo podman build --format docker \
             "${BUILD_ARGS[@]}" \
-            "${TAG_ARGS[@]}" \
+            "${BUILD_TAG[@]}" \
             "${LABEL_ARGS[@]}" \
             .
 
