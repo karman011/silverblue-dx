@@ -158,6 +158,7 @@
     "firefox",
     "podman-docker",
     "totem-video-thumbnailer",
-    "gnome-software-rpm-ostree"
+    "gnome-software-rpm-ostree",
+    "ostree-grub2"
   ]
 }
