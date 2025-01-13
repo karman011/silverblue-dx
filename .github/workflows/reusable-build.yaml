@@ -239,7 +239,7 @@ jobs:
       - name: Rechunk Image
         id: rechunk
         if: inputs.rechunk == true
-        uses: hhd-dev/rechunk@602e6d62558ab23e15e8764ce06e26c0f328da71 # v1.0.1
+        uses: hhd-dev/rechunk@0aee79e67dc9354779924ccc0fcdd7ef0b874d0d # v1.1.2
         with:
           rechunk: ghcr.io/hhd-dev/rechunk:v1.0.1
           ref: ${{ steps.build_image.outputs.image }}:${{ steps.build_image.outputs.raw_tag }}
